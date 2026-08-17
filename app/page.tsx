@@ -19,6 +19,10 @@ export default function FlipCultureHome() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Form State
+  const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
+  const [formSubmitting, setFormSubmitting] = useState<boolean>(false);
+
   // Load Top Featured Vault Items
   useEffect(() => {
     async function loadFeatured() {
@@ -65,6 +69,29 @@ export default function FlipCultureHome() {
     setSearchQuery('');
     setActiveSearch('');
     setActiveCategory(id);
+  };
+
+  // Client-Side Netlify Form Submission
+  const handleFormSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormSubmitting(true);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+
+    try {
+      await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData as any).toString(),
+      });
+      setFormSubmitted(true);
+      form.reset();
+    } catch (error) {
+      console.error('Form submission error:', error);
+    } finally {
+      setFormSubmitting(false);
+    }
   };
 
   return (
@@ -359,72 +386,81 @@ export default function FlipCultureHome() {
           </p>
         </div>
 
-        <form
-          name="contact-email"
-          method="POST"
-          data-netlify="true"
-          className="bg-neutral-900 border border-neutral-800 p-8 rounded-2xl space-y-4"
-        >
-          <input type="hidden" name="form-name" value="contact-email" />
-
-          <div>
-            <label
-              htmlFor="user-name"
-              className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2"
-            >
-              Your Name
-            </label>
-            <input
-              type="text"
-              id="user-name"
-              name="name"
-              required
-              placeholder="Enter your name"
-              className="w-full bg-neutral-950 border border-neutral-800 text-white text-xs rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500"
-            />
+        {formSubmitted ? (
+          <div className="bg-purple-900/30 border border-purple-500/50 p-8 rounded-2xl text-center">
+            <h3 className="text-xl font-bold text-emerald-400 mb-2">Message Sent!</h3>
+            <p className="text-neutral-300 text-xs">
+              Thank you for reaching out. The Flip Culture team will respond to your request shortly.
+            </p>
           </div>
-
-          <div>
-            <label
-              htmlFor="user-email"
-              className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2"
-            >
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="user-email"
-              name="email"
-              required
-              placeholder="your-email@example.com"
-              className="w-full bg-neutral-950 border border-neutral-800 text-white text-xs rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="user-message"
-              className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2"
-            >
-              Message / Sourcing Request
-            </label>
-            <textarea
-              id="user-message"
-              name="message"
-              rows={4}
-              required
-              placeholder="Tell us what item, size, or spec you are hunting for..."
-              className="w-full bg-neutral-950 border border-neutral-800 text-white text-xs rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500"
-            ></textarea>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-widest py-3.5 rounded-lg transition"
+        ) : (
+          <form
+            name="contact-email"
+            onSubmit={handleFormSubmit}
+            className="bg-neutral-900 border border-neutral-800 p-8 rounded-2xl space-y-4"
           >
-            Send Email Message
-          </button>
-        </form>
+            <input type="hidden" name="form-name" value="contact-email" />
+
+            <div>
+              <label
+                htmlFor="user-name"
+                className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2"
+              >
+                Your Name
+              </label>
+              <input
+                type="text"
+                id="user-name"
+                name="name"
+                required
+                placeholder="Enter your name"
+                className="w-full bg-neutral-950 border border-neutral-800 text-white text-xs rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="user-email"
+                className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2"
+              >
+                Email Address
+              </label>
+              <input
+                type="email"
+                id="user-email"
+                name="email"
+                required
+                placeholder="your-email@example.com"
+                className="w-full bg-neutral-950 border border-neutral-800 text-white text-xs rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500"
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="user-message"
+                className="block text-xs font-bold text-neutral-300 uppercase tracking-wider mb-2"
+              >
+                Message / Sourcing Request
+              </label>
+              <textarea
+                id="user-message"
+                name="message"
+                rows={4}
+                required
+                placeholder="Tell us what item, size, or spec you are hunting for..."
+                className="w-full bg-neutral-950 border border-neutral-800 text-white text-xs rounded-lg px-4 py-3 focus:outline-none focus:border-purple-500"
+              ></textarea>
+            </div>
+
+            <button
+              type="submit"
+              disabled={formSubmitting}
+              className="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-widest py-3.5 rounded-lg transition disabled:opacity-50"
+            >
+              {formSubmitting ? 'Sending...' : 'Send Email Message'}
+            </button>
+          </form>
+        )}
       </section>
 
       {/* SEMANTIC FOOTER */}
