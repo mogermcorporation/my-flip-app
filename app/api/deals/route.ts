@@ -2,23 +2,24 @@ import { NextResponse } from 'next/server';
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
+  const featured = searchParams.get('featured');
   const category = searchParams.get('category') || 'sneakers';
   const customQuery = searchParams.get('q');
 
-  // Expanded preset mappings
+  // Search queries for featured hero items vs standard category filters
+  const featuredQuery = 'Jordan 1 Retro High OR ROG Zephyrus G16 OR Steam Deck OLED';
   const searchQueries: Record<string, string> = {
     sneakers: 'Jordan 1 OR Yeezy 350 OR Nike Dunk Low',
     streetwear: 'Supreme hoodie OR Fear of God Essentials OR Stussy',
     laptops: 'ROG Zephyrus OR Razer Blade OR Alienware',
     handhelds: 'Steam Deck OLED OR ROG Ally',
-    battlestation: 'OLED Gaming Monitor OR SteelSeries Wireless OR Logitech G Pro',
+    battlestation: 'OLED Gaming Monitor OR SteelSeries Wireless',
     collectibles: 'Pokemon Booster Box Sealed OR Vintage Camcorder',
   };
 
-  // Prioritize active search bar input; fallback to preset category query
-  const rawQuery = customQuery && customQuery.trim() !== '' 
-    ? customQuery 
-    : (searchQueries[category] || searchQueries.sneakers);
+  const rawQuery = featured === 'true' 
+    ? featuredQuery 
+    : (customQuery && customQuery.trim() !== '' ? customQuery : (searchQueries[category] || searchQueries.sneakers));
 
   const query = encodeURIComponent(rawQuery);
 
@@ -40,13 +41,13 @@ export async function GET(request: Request) {
     const { access_token } = await tokenRes.json();
 
     const ebayRes = await fetch(
-      `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${query}&limit=16&filter=buyingOptions:{FIXED_PRICE}`,
+      `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${query}&limit=${featured === 'true' ? '4' : '16'}&filter=buyingOptions:{FIXED_PRICE}`,
       {
         headers: {
           Authorization: `Bearer ${access_token}`,
           'X-EBAY-C-MARKETPLACE-ID': 'EBAY_US',
         },
-        next: { revalidate: 300 }, // Refresh cache every 5 minutes
+        next: { revalidate: 300 },
       }
     );
 
