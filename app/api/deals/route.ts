@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/next';
+import { NextResponse } from 'next/server';
 
 async function getEbayAccessToken() {
   const appId = process.env.EBAY_APP_ID;
