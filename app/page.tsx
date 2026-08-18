@@ -23,15 +23,20 @@ export default function FlipCultureHome() {
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false);
   const [formSubmitting, setFormSubmitting] = useState<boolean>(false);
 
-  // Helper function to build working eBay affiliate URLs
+  // Clean, fail-safe URL generator for eBay affiliate links
   const getAffiliateUrl = (itemWebUrl?: string) => {
     if (!itemWebUrl) return 'https://www.ebay.com';
-    const campaignId = process.env.NEXT_PUBLIC_EPN_CAMPAIGN_ID || '';
-    if (campaignId) {
-      return `https://www.ebay.com/itm/redirect?target=${encodeURIComponent(
+
+    const campaignId = process.env.NEXT_PUBLIC_EPN_CAMPAIGN_ID;
+
+    // If campaign ID exists, route through eBay's primary affiliate gateway
+    if (campaignId && campaignId.trim() !== '') {
+      return `https://rover.ebay.com/rover/1/711-53200-19255-0/1?mpre=${encodeURIComponent(
         itemWebUrl
-      )}&mkevt=1&mkcid=1&mkrid=711-53200-19255-0&campid=${campaignId}&toolid=10001`;
+      )}&campid=${campaignId.trim()}&toolid=10001&customid=flipculture`;
     }
+
+    // Fallback directly to the live item link if campaign ID isn't set
     return itemWebUrl;
   };
 
@@ -323,4 +328,3 @@ export default function FlipCultureHome() {
       </footer>
     </main>
   );
-}
