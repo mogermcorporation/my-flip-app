@@ -38,23 +38,23 @@ export async function GET(request: Request) {
 
     const token = await getEbayAccessToken();
 
-    // Mapping categories to strict search terms with negative filters to exclude cheap items
+    // Updated trending queries with negative filters to exclude cheap novelty items
     const categoryQueries: Record<string, string> = {
-      sneakers: 'Nike Jordan Yeezy sneaker -keychain -mini -miniature -display -box',
-      streetwear: 'Supreme Fear of God Hoodie -keychain -sticker -pin',
-      laptops: 'Gaming Laptop RTX MacBook Pro -case -skin -cover',
-      handhelds: 'Steam Deck Asus ROG Ally Nintendo Switch OLED -case -cover',
-      battlestation: 'Gaming Monitor Mechanical Keyboard -cable -wristrest',
-      collectibles: 'Bearbrick Kaws Figure Funko Grail -keychain',
+      sneakers: 'Jordan 4 ASICS Kayano Salomon XT-6 New Balance 9060 -keychain -mini -box -sticker',
+      streetwear: 'Corteiz Denim Tears Represent Hoodie Hellstar Essentials -sticker -keychain -pin',
+      laptops: 'ROG Zephyrus Legion Pro MacBook Pro RTX -case -skin -cover -adapter',
+      handhelds: 'Legion Go ROG Ally X Steam Deck OLED Switch OLED -case -cover -screenprotector',
+      battlestation: 'OLED Gaming Monitor Mechanical Keyboard -cable -wristrest -mousepad',
+      collectibles: 'Bearbrick 400% KAWS Figure Funko Grail -keychain -sticker',
     };
 
     let query = searchQuery || categoryQueries[category] || categoryQueries['sneakers'];
 
     if (isFeatured) {
-      query = 'Air Jordan 4 Retro -keychain -mini';
+      query = 'Air Jordan 4 Retro Black Cat RTX 4090 -keychain -mini';
     }
 
-    // Set a minimum price of $50 to filter out cheap novelty items
+    // Enforce $50 minimum price filter to keep feed high-value
     const ebayUrl = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(
       query
     )}&limit=12&filter=price:[50..],priceCurrency:USD`;
