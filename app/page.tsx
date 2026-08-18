@@ -29,14 +29,12 @@ export default function FlipCultureHome() {
 
     const campaignId = process.env.NEXT_PUBLIC_EPN_CAMPAIGN_ID;
 
-    // If campaign ID exists, route through eBay's primary affiliate gateway
     if (campaignId && campaignId.trim() !== '') {
       return `https://rover.ebay.com/rover/1/711-53200-19255-0/1?mpre=${encodeURIComponent(
         itemWebUrl
       )}&campid=${campaignId.trim()}&toolid=10001&customid=flipculture`;
     }
 
-    // Fallback directly to the live item link if campaign ID isn't set
     return itemWebUrl;
   };
 
@@ -183,12 +181,17 @@ export default function FlipCultureHome() {
               className="bg-neutral-900 border-2 border-purple-600/50 rounded-xl p-4 flex flex-col justify-between shadow-lg shadow-purple-900/20 hover:border-purple-500 transition"
             >
               <div>
-                <div className="h-44 bg-neutral-950 rounded-lg overflow-hidden mb-3 border border-neutral-800 flex items-center justify-center p-2 relative">
+                <a
+                  href={getAffiliateUrl(item.itemWebUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block h-44 bg-neutral-950 rounded-lg overflow-hidden mb-3 border border-neutral-800 flex items-center justify-center p-2 relative group"
+                >
                   {item.image ? (
                     <img
                       src={item.image.imageUrl}
                       alt={item.title}
-                      className="h-full object-contain"
+                      className="h-full object-contain group-hover:scale-105 transition duration-300"
                     />
                   ) : (
                     <span className="text-neutral-600 text-xs">Featured Item</span>
@@ -196,10 +199,15 @@ export default function FlipCultureHome() {
                   <span className="absolute top-2 left-2 bg-purple-600 text-white text-[9px] font-bold px-2 py-0.5 rounded">
                     VAULT PICK
                   </span>
-                </div>
-                <h3 className="font-bold text-sm line-clamp-2 text-white">
+                </a>
+                <a
+                  href={getAffiliateUrl(item.itemWebUrl)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-bold text-sm line-clamp-2 text-white hover:text-purple-400 transition"
+                >
                   {item.title}
-                </h3>
+                </a>
               </div>
               <div className="mt-4 pt-3 border-t border-neutral-800 flex items-center justify-between">
                 <span className="text-lg font-extrabold text-emerald-400">
@@ -277,7 +285,12 @@ export default function FlipCultureHome() {
                 className="bg-neutral-900 border border-neutral-800 rounded-xl p-4 flex flex-col justify-between hover:border-neutral-700 transition group"
               >
                 <div>
-                  <div className="relative h-48 w-full bg-neutral-950 rounded-lg overflow-hidden mb-4 border border-neutral-800 flex items-center justify-center">
+                  <a
+                    href={getAffiliateUrl(item.itemWebUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative h-48 w-full bg-neutral-950 rounded-lg overflow-hidden mb-4 border border-neutral-800 flex items-center justify-center block"
+                  >
                     {item.image ? (
                       <img
                         src={item.image.imageUrl}
@@ -290,11 +303,16 @@ export default function FlipCultureHome() {
                     <span className="absolute top-2 left-2 bg-black/80 text-emerald-400 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-500/30">
                       VERIFIED
                     </span>
-                  </div>
+                  </a>
 
-                  <h3 className="font-semibold text-sm line-clamp-2 text-neutral-200 group-hover:text-white">
+                  <a
+                    href={getAffiliateUrl(item.itemWebUrl)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-semibold text-sm line-clamp-2 text-neutral-200 hover:text-purple-400 transition"
+                  >
                     {item.title}
-                  </h3>
+                  </a>
                 </div>
 
                 <div className="mt-4 pt-4 border-t border-neutral-800/80 flex items-center justify-between">
@@ -322,9 +340,73 @@ export default function FlipCultureHome() {
         )}
       </section>
 
+      {/* ABOUT SECTION */}
+      <section id="about" className="max-w-7xl mx-auto px-6 py-16 border-t border-neutral-800">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+          <div>
+            <h2 className="text-3xl font-extrabold text-white tracking-tight mb-4">
+              About Flip Culture
+            </h2>
+            <p className="text-neutral-400 text-sm leading-relaxed mb-4">
+              Flip Culture is a curated discovery platform built for collectors, sneakerheads, and tech enthusiasts. We aggregate verified, high-demand inventory directly from live marketplace streams.
+            </p>
+          </div>
+          <div className="bg-neutral-900 p-8 rounded-2xl border border-neutral-800 shadow-xl">
+            <h3 className="text-lg font-bold text-white mb-4">The Vault Standard</h3>
+            <ul className="space-y-3 text-xs text-neutral-400">
+              <li className="flex items-center gap-2">
+                <span className="text-emerald-400 font-bold">✓</span> 100% Real-Time Active Market Data
+              </li>
+              <li className="flex items-center gap-2">
+                <span className="text-emerald-400 font-bold">✓</span> Curated High-Margin & Rare Collections
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* CONTACT SECTION */}
+      <section id="contact" className="max-w-3xl mx-auto px-6 py-16 border-t border-neutral-800">
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-extrabold text-white tracking-tight">
+            Have Questions or a Custom Request?
+          </h2>
+        </div>
+
+        {formSubmitted ? (
+          <div className="bg-purple-900/30 border border-purple-500/50 p-8 rounded-2xl text-center">
+            <h3 className="text-xl font-bold text-emerald-400 mb-2">Message Sent!</h3>
+          </div>
+        ) : (
+          <form
+            name="contact-email"
+            onSubmit={handleFormSubmit}
+            className="bg-neutral-900 border border-neutral-800 p-8 rounded-2xl space-y-4"
+          >
+            <input type="hidden" name="form-name" value="contact-email" />
+            <div>
+              <label htmlFor="user-name" className="block text-xs font-bold text-neutral-300 uppercase mb-2">Your Name</label>
+              <input type="text" id="user-name" name="name" required className="w-full bg-neutral-950 border border-neutral-800 text-white text-xs rounded-lg px-4 py-3" />
+            </div>
+            <div>
+              <label htmlFor="user-email" className="block text-xs font-bold text-neutral-300 uppercase mb-2">Email Address</label>
+              <input type="email" id="user-email" name="email" required className="w-full bg-neutral-950 border border-neutral-800 text-white text-xs rounded-lg px-4 py-3" />
+            </div>
+            <div>
+              <label htmlFor="user-message" className="block text-xs font-bold text-neutral-300 uppercase mb-2">Message</label>
+              <textarea id="user-message" name="message" rows={4} required className="w-full bg-neutral-950 border border-neutral-800 text-white text-xs rounded-lg px-4 py-3"></textarea>
+            </div>
+            <button type="submit" disabled={formSubmitting} className="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase py-3.5 rounded-lg transition">
+              {formSubmitting ? 'Sending...' : 'Send Message'}
+            </button>
+          </form>
+        )}
+      </section>
+
       {/* FOOTER */}
       <footer className="border-t border-neutral-800 py-12 text-center text-neutral-500 text-xs">
         <p>© {new Date().getFullYear()} Flip Culture. All rights reserved.</p>
       </footer>
     </main>
   );
+}
